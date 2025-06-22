@@ -1,0 +1,5 @@
+{
+  "watch": ["design-pattern"],
+  "ext": "ts",
+  "exec": "webpack --config webpack.config.js && node output/bundle.js"
+}
