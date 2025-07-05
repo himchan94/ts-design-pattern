@@ -2,10 +2,65 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./design-pattern/iterator/array.ts":
-/*!******************************************!*\
-  !*** ./design-pattern/iterator/array.ts ***!
-  \******************************************/
+/***/ "./design-pattern/template/Article.ts":
+/*!********************************************!*\
+  !*** ./design-pattern/template/Article.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+class Article {
+    constructor(title, content, footer) {
+        this.title = title;
+        this.content = content;
+        this.footer = footer;
+    }
+    getTitle() {
+        return this.title;
+    }
+    getContent() {
+        return this.content;
+    }
+    getFooter() {
+        return this.footer;
+    }
+}
+exports["default"] = Article;
+
+
+/***/ }),
+
+/***/ "./design-pattern/template/DisplayArticleTemplate.ts":
+/*!***********************************************************!*\
+  !*** ./design-pattern/template/DisplayArticleTemplate.ts ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+class DisplayArticleTemplate {
+    constructor(article) {
+        this.article = article;
+        // 파생 클래스에서 코드를 변경하지 못하도록 readonly
+        this.displayHtml = () => {
+            return `
+      ${this.titleHtml()}
+      ${this.contentHtml()}
+      ${this.footerHtml()}
+    `;
+        };
+    }
+}
+exports["default"] = DisplayArticleTemplate;
+
+
+/***/ }),
+
+/***/ "./design-pattern/template/EditableDisplayArticle.ts":
+/*!***********************************************************!*\
+  !*** ./design-pattern/template/EditableDisplayArticle.ts ***!
+  \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -13,57 +68,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const arrayIterator_1 = __importDefault(__webpack_require__(/*! ./arrayIterator */ "./design-pattern/iterator/arrayIterator.ts"));
-class Array {
-    // private items: Item[];
-    constructor(items) {
-        this.items = items;
+const DisplayArticleTemplate_1 = __importDefault(__webpack_require__(/*! ./DisplayArticleTemplate */ "./design-pattern/template/DisplayArticleTemplate.ts"));
+class EditableDisplayArticle extends DisplayArticleTemplate_1.default {
+    constructor(article) {
+        super(article);
     }
-    iterator() {
-        return new arrayIterator_1.default(this);
+    titleHtml() {
+        return `<div><span>제목</span><input value="${this.article.getTitle()}"/></div>`;
     }
-    getItem(index) {
-        return this.items[index];
+    contentHtml() {
+        const items = this.article.getContent().map(item => `${item}\n`);
+        return `<span>내용</span><br/><textarea cols="50" rows="5">${items.join("")}</textarea>`;
     }
-    get count() {
-        return this.items.length;
+    footerHtml() {
+        return `<div><span>푸터</span><input value="${this.article.getFooter()}"/></div>`;
     }
 }
-exports["default"] = Array;
+exports["default"] = EditableDisplayArticle;
 
 
 /***/ }),
 
-/***/ "./design-pattern/iterator/arrayIterator.ts":
-/*!**************************************************!*\
-  !*** ./design-pattern/iterator/arrayIterator.ts ***!
-  \**************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-class ArrayIterator {
-    constructor(array) {
-        this.array = array;
-        this.index = -1;
-    }
-    current() {
-        return this.array.getItem(this.index);
-    }
-    next() {
-        this.index++;
-        return this.index < this.array.count;
-    }
-}
-exports["default"] = ArrayIterator;
-
-
-/***/ }),
-
-/***/ "./design-pattern/iterator/index.ts":
-/*!******************************************!*\
-  !*** ./design-pattern/iterator/index.ts ***!
-  \******************************************/
+/***/ "./design-pattern/template/SimpleDisplayArticle.ts":
+/*!*********************************************************!*\
+  !*** ./design-pattern/template/SimpleDisplayArticle.ts ***!
+  \*********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -71,52 +100,67 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const array_1 = __importDefault(__webpack_require__(/*! ./array */ "./design-pattern/iterator/array.ts"));
-const item_1 = __importDefault(__webpack_require__(/*! ./item */ "./design-pattern/iterator/item.ts"));
-const items = [
-    new item_1.default("쿠쿠다스", 2500),
-    new item_1.default("몽쉘", 500),
-    new item_1.default("쿠키", 1500),
-    new item_1.default("통밀식빵", 10500)
-];
-const array = new array_1.default(items);
-const iter = array.iterator();
-while (iter.next()) {
-    const item = iter.current();
-    console.log(item);
+const DisplayArticleTemplate_1 = __importDefault(__webpack_require__(/*! ./DisplayArticleTemplate */ "./design-pattern/template/DisplayArticleTemplate.ts"));
+class SimpleDisplayArticle extends DisplayArticleTemplate_1.default {
+    constructor(article) {
+        super(article);
+    }
+    titleHtml() {
+        return `<h1>${this.article.getTitle()}</h1>`;
+    }
+    contentHtml() {
+        const items = this.article.getContent().map(item => {
+            return `<li>${item}</li>`;
+        }).join("");
+        return `<ul>${items}</ul>`;
+    }
+    footerHtml() {
+        return `<h3>${this.article.getFooter()}</h3>`;
+    }
 }
+exports["default"] = SimpleDisplayArticle;
+;
 
 
 /***/ }),
 
-/***/ "./design-pattern/iterator/item.ts":
-/*!*****************************************!*\
-  !*** ./design-pattern/iterator/item.ts ***!
-  \*****************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ "./design-pattern/template/index.ts":
+/*!******************************************!*\
+  !*** ./design-pattern/template/index.ts ***!
+  \******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-class Item {
-    // private _name: string;
-    // private _cost: number;
-    //
-    // constructor(name: string, cost: number) {
-    //   this._name = name;
-    //   this._cost = cost;
-    // }
-    constructor(_name, _cost) {
-        this._name = _name;
-        this._cost = _cost;
+const Article_1 = __importDefault(__webpack_require__(/*! ./Article */ "./design-pattern/template/Article.ts"));
+const SimpleDisplayArticle_1 = __importDefault(__webpack_require__(/*! ./SimpleDisplayArticle */ "./design-pattern/template/SimpleDisplayArticle.ts"));
+const EditableDisplayArticle_1 = __importDefault(__webpack_require__(/*! ./EditableDisplayArticle */ "./design-pattern/template/EditableDisplayArticle.ts"));
+const article = new Article_1.default("제목이다", ["내용1", "내용2", "내용3"], "푸터다");
+const display = new SimpleDisplayArticle_1.default(article);
+// 브라우저 환경에서만 실행
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+    const contentElement = document.querySelector(".content");
+    if (contentElement) {
+        contentElement.innerHTML = display.displayHtml();
     }
-    get name() {
-        return this._name;
-    }
-    get cost() {
-        return this._cost;
-    }
+    (_a = document.querySelector(".edit-mode")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", (e) => {
+        let display;
+        if (e.target.checked) {
+            display = new EditableDisplayArticle_1.default(article);
+        }
+        else {
+            display = new SimpleDisplayArticle_1.default(article);
+        }
+        const contentElement = document.querySelector(".content");
+        if (contentElement) {
+            contentElement.innerHTML = display.displayHtml();
+        }
+    });
 }
-exports["default"] = Item;
 
 
 /***/ })
@@ -152,7 +196,7 @@ exports["default"] = Item;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./design-pattern/iterator/index.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./design-pattern/template/index.ts");
 /******/ 	
 /******/ })()
 ;
